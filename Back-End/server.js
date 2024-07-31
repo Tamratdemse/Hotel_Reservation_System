@@ -4,20 +4,23 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const mysql = require("mysql2/promise");
 
+const users = require("./routes/user");
+
 const app = express();
 const port = 5000;
 
 app.use(bodyParser.json());
 app.use(cors());
 
+app.use("/user", users);
+
 // MySQL Database Connection
 const dbConfig = {
   host: "localhost",
   user: "root",
   password: "", // Replace with your actual password
-  database: "userdb", // Replace with your actual database name
+  database: "HOTEL_RESERVATION_SYSTEM", // Replace with your actual database name
 };
-
 // Signup Endpoint
 app.post("/signup", async (req, res) => {
   const { username, password, fullname, email, phone_number, role } = req.body;
