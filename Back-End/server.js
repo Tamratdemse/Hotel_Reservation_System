@@ -4,11 +4,15 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const mysql = require("mysql2/promise");
 
+const users = require("./routes/user");
+
 const app = express();
 const port = 5000;
 
 app.use(bodyParser.json());
 app.use(cors());
+
+app.use("/user", users);
 
 // MySQL Database Connection Pool
 const dbConfig = {
@@ -17,8 +21,6 @@ const dbConfig = {
   password: "", // Replace with your actual password
   database: "HOTEL_RESERVATION_SYSTEM", // Replace with your actual database name
 };
-
-const pool = mysql.createPool(dbConfig);
 
 // Signup Endpoint
 app.post("/signup", async (req, res) => {
@@ -83,52 +85,6 @@ app.post("/login", async (req, res) => {
 
     console.log("User logged in successfully");
     res.json({ message: "Login successful", role: user[0].role }); // Include role for redirection
-  } catch (error) {
-    console.error("Database error:", error);
-    res.status(500).json({ message: "Database error" });
-  }
-});
-
-app.get("/hotel/:id", async (req, res) => {
-  const hotelId = req.params.id;
-
-  const query = `
-      SELECT 
-          h.hotel_name, 
-          h.location, 
-          h.rating, 
-          c.category_name, 
-          c.price,
-          COUNT(r.room_id) AS total_rooms,
-          SUM(r.is_available) AS available_rooms
-      FROM Hotels h
-      JOIN Category c ON h.hotel_id = c.hotel_id
-      JOIN Rooms r ON c.category_id = r.category_id
-      WHERE h.hotel_id = ?
-      GROUP BY c.category_id;
-  `;
-
-  try {
-    const db = await pool.getConnection();
-    const [results] = await db.query(query, [hotelId]);
-    db.release();
-
-    if (results.length > 0) {
-      const hotelDetails = {
-        hotel_name: results[0].hotel_name,
-        location: results[0].location,
-        rating: results[0].rating,
-        categories: results.map((row) => ({
-          category_name: row.category_name,
-          price: row.price,
-          available_rooms: row.available_rooms,
-          total_rooms: row.total_rooms,
-        })),
-      };
-      res.json(hotelDetails);
-    } else {
-      res.status(404).json({ message: "Hotel not found" });
-    }
   } catch (error) {
     console.error("Database error:", error);
     res.status(500).json({ message: "Database error" });
