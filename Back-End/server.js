@@ -4,18 +4,22 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const mysql = require("mysql2/promise");
 
+const users = require("./routes/user");
+
 const app = express();
 const port = 5000;
 
 app.use(bodyParser.json());
 app.use(cors());
 
-// MySQL Database Connection
+app.use("/user", users);
+
+// MySQL Database Connection Pool
 const dbConfig = {
   host: "localhost",
   user: "root",
   password: "", // Replace with your actual password
-  database: "userdb", // Replace with your actual database name
+  database: "HOTEL_RESERVATION_SYSTEM", // Replace with your actual database name
 };
 
 // Signup Endpoint
@@ -27,7 +31,7 @@ app.post("/signup", async (req, res) => {
   }
 
   try {
-    const db = await mysql.createConnection(dbConfig);
+    const db = await pool.getConnection();
 
     // Check if username already exists
     const [existingUser] = await db.query(
@@ -35,6 +39,7 @@ app.post("/signup", async (req, res) => {
       [username]
     );
     if (existingUser.length > 0) {
+      db.release();
       return res.status(409).json({ message: "Username already exists" });
     }
 
@@ -43,6 +48,7 @@ app.post("/signup", async (req, res) => {
       "INSERT INTO users (username, password, fullname, email, phone_number, role) VALUES (?, ?, ?, ?, ?, ?)",
       [username, hashedPassword, fullname, email, phone_number, role || "user"]
     );
+    db.release();
     console.log("User registered successfully");
     res.json({ message: "Signup successful" });
   } catch (error) {
@@ -62,11 +68,12 @@ app.post("/login", async (req, res) => {
   }
 
   try {
-    const db = await mysql.createConnection(dbConfig);
+    const db = await pool.getConnection();
 
     const [user] = await db.query("SELECT * FROM users WHERE username = ?", [
       username,
     ]);
+    db.release();
     if (user.length === 0) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
