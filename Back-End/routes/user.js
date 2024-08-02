@@ -1,6 +1,8 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const pool = mysql.createPool({
   host: "localhost",
@@ -70,6 +72,46 @@ router.get("/hotel/:id", async (req, res) => {
     console.error("Error querying database:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+});
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+router.post("/login-2", (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).json({ error: "Username is required" });
+  }
+
+  // Create a JWT token
+  const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: "1h" });
+  res.json({ token });
+});
+
+// Token Validation Middleware
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
+// Protected Reservation Endpoint
+router.post("/reservation", authenticateToken, (req, res) => {
+  const { duration } = req.body;
+  if (!duration) {
+    return res.status(400).send("Duration is required");
+  }
+
+  console.log("Duration:", duration);
+  console.log("User Info from Token:", req.user);
+
+  res.status(200).send("Reservation request received -tame new man");
 });
 
 module.exports = router;
