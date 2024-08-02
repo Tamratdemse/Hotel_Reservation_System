@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./registration.css";
 
 const Registration = () => {
@@ -49,59 +49,88 @@ const Registration = () => {
   };
 
   return (
-    <div className={`wrapper ${isSignup ? "active" : ""}`}>
-      <div className="form signup">
-        <header className="signup-header" onClick={toggleForm}>
-          Signup
-        </header>
-        <form onSubmit={(e) => handleSubmit(e, "/signup")}>
-          <select value={user} onChange={(e) => setUser(e.target.value)}>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-          <input type="text" placeholder="Full name" name="fullname" required />
-          <input
-            type="email"
-            placeholder="Email address"
-            name="email"
-            required
-          />
-          <input
-            type="text"
-            name="phone_number"
-            placeholder="Phone number"
-            required
-          />
-          <input type="text" name="username" placeholder="User name" required />
-          <input
-            type="password"
-            placeholder="Password"
-            name="password"
-            required
-          />
-          {user === "admin" ? (
-            <input type="number" placeholder="ID" name="id" required />
-          ) : null}
-          <input className="btn" type="submit" name="submit" value="Signup" />
-        </form>
-      </div>
+    <div>
+      <Link to="/">
+        <div className="registration-logo">
+          <img src="img/nafLogo.png" alt="Logo" />
+        </div>
+      </Link>
+      <div className="registration-container">
+        <div className={`wrapper ${isSignup ? "active" : ""}`}>
+          <div className="form signup">
+            <header className="signup-header" onClick={toggleForm}>
+              Signup
+            </header>
+            <form onSubmit={(e) => handleSubmit(e, "/signup")}>
+              <select value={user} onChange={(e) => setUser(e.target.value)}>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+              <input
+                type="text"
+                placeholder="Full name"
+                name="fullname"
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email address"
+                name="email"
+                required
+              />
+              <input
+                type="text"
+                name="phone_number"
+                placeholder="Phone number"
+                required
+              />
+              <input
+                type="text"
+                name="username"
+                placeholder="User name"
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                name="password"
+                required
+              />
+              {user === "admin" ? (
+                <input type="number" placeholder="ID" name="id" required />
+              ) : null}
+              <input
+                className="btn"
+                type="submit"
+                name="submit"
+                value="Signup"
+              />
+            </form>
+          </div>
 
-      <div className="form login">
-        <header className="login-header" onClick={toggleForm}>
-          Login
-        </header>
-        <form onSubmit={(e) => handleSubmit(e, "/login")}>
-          <input type="text" name="username" placeholder="User name" required />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-          />
-          <input type="submit" value="Login" />
-        </form>
+          <div className="form login">
+            <header className="login-header" onClick={toggleForm}>
+              Login
+            </header>
+            <form onSubmit={(e) => handleSubmit(e, "/login")}>
+              <input
+                type="text"
+                name="username"
+                placeholder="User name"
+                required
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                required
+              />
+              <input type="submit" value="Login" />
+            </form>
+          </div>
+          {errorMessage && <div className="error">{errorMessage}</div>}
+        </div>
       </div>
-      {errorMessage && <div className="error">{errorMessage}</div>}
     </div>
   );
 };

@@ -6,13 +6,28 @@
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
-body {
+.registration-container {
   min-height: 100vh;
   display: flex;
+
   align-items: center;
   justify-content: center;
   background: #323335;
 }
+.registration-logo {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 70px;
+}
+.registration-logo img {
+  width: 6rem;
+  height: 6rem;
+  cursor: pointer;
+  object-fit: contain;
+  margin-left: 30px;
+}
+
 select {
   height: 38px;
   padding: 5px;
@@ -22,6 +37,7 @@ select {
 .wrapper {
   position: relative;
   width: 400px;
+  margin: 80px 0;
   border-radius: 12px;
   padding: 20px 30px 120px;
   background: #252629;
